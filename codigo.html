@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Home</title>
+    <link rel="icon" href="media/LogoNavidad.jpeg" type="image/icon">
+    <link rel="stylesheet" href="estilos.css">
+    <!--Importamos los scripts necesarios para cumplimentar el html-->
+    <script src="Scripts/perfil.js" defer></script>
+    <script src="Scripts/sign_in.js" defer></script>
+    <script src="Scripts/log_in.js" defer></script>
+    <script src="Scripts/contador.js" defer></script>
+    <script src="Scripts/cartas.js" defer></script>
+    <script src="Scripts/juegos.js" defer></script>
+    <script src="Scripts/calendario_adviento.js"defer></script>
+    <script src="Scripts/market_place.js" defer></script>
+    <script src="Scripts/quiz.js" defer></script>
+    <script src="Scripts/carrito.js" defer></script>
+    <script src="Scripts/mapa.js" defer></script>
+    <script src="Scripts/cita-papa-noel.js" defer></script>
+    <script src="Scripts/compras.js" defer></script>
+    <script src="Scripts/catalogo.js" defer></script>
+    <script>
+      window.onload = function() {
+        const datosGuardados = JSON.parse(localStorage.getItem('datosUsuario')) || [];
+        
+        for (let i = 0; i < datosGuardados.length; i++) {
+            if (datosGuardados[i].sesionIniciada === 1) {
+                datosGuardados[i].sesionIniciada = 0; // Cambiar el valor de sesionIniciada a 0
+                break;
+            }
+        }
+        localStorage.setItem('datosUsuario', JSON.stringify(datosGuardados)); // Guardar los datos actualizados en local storage
+      };
+  </script>
+</head>
+
+<body>
+    <header>
+
+        <!-- Logo alineado a la izquierda -->
+        <img src="media/LogoNavidad.jpeg" alt="Logo de la empresa">
+        <div class="menu">
+          <!-- Menú hamburguesa con un checkbox como funcionalidad-->
+          <label for="toggle">&#9776;</label>
+          <input type="checkbox" id="toggle">
+          <!-- Enlaces alineados a la derecha -->
+          <div class="nav-links">
+              <a href="#home" class="home">Home</a>
+              <a href="#papa-noel">Papá Noel</a>
+              <a href="#las-cartas">Las Cartas</a>
+              <a href="#envia-tu-carta">Envía tu carta</a>
+              <a href="#juega">¡Juega!</a>
+              <a href="#calendario-adviento">Calendario de Adviento</a> 
+              <a href="#marketplace">Marketplace</a>
+              <a href="#quiz">Quiz</a>
+              <a href="#catalogoJuguetes">Catálogo</a>
+              <a href="#mapa-localizacion">Mapa</a>
+              <a href="#cita-papa-noel">Videollamada</a>
+          </div> 
+            <div class="user"></div>
+            <a class="sing-in" onclick="mostrarPopup_IS()">Iniciar sesión</a>
+            <a class="register" onclick="mostrarPopup_R()">Registrarse</a>
+            <div class="profile-menu" id="profileMenu" style="display: none;">
+              <img src="media/fotoperfil.png" alt="Perfil" onclick="toggleProfileMenu()">
+              <div class="profile-dropdown" id="profileDropdown" style="display: none;">
+                <!-- Enlaces del menú de perfil -->
+                  <a href="#" onclick="mostrarPopupPerfil()">Mi perfil</a>
+                  <a href="#" onclick="mostrarPopupCartas()">Mis cartas</a>
+                  <a href="#" onclick="mostrarCarrito()">Mi Carrito</a>
+                  <a href="#" onclick="mostrarCompras()">Mis Compras</a>
+                  <a href="#" onclick="cerrarSesion()">Cerrar sesión</a>
+              </div>
+            </div>
+          </div>
+        </div>
+    </header>
+
+    <!-- Pop-up de inicio de sesión -->
+    <div id="popup_IS" class="popup_IS">
+      <div class="popup_IS-content">
+        <h2>Iniciar Sesión</h2>
+        <label for="usuario_IS" class="inicio-sesion-label">Usuario</label>
+          <input type="text" id="usuario_IS" placeholder="Introduce el usuario" required>
+        <label for="password_IS" class="inicio-sesion-label">Contraseña</label>
+          <input type="password" id="password_IS" placeholder="Introduce la contraseña" required>
+        <!-- Botones de aceptar y cancelar -->
+        <button onclick="iniciarSesion()">Entrar</button>
+        <button onclick="cerrarPopup_IS()">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- Pop-up de registro -->
+    <div id="popup_R" class="popup_R">
+      <div class="popup_R-content">
+        <h2>Registrarse</h2>
+        <form id="formRegistro"> <!-- Formulario de registro -->
+          <input type="text" id="usuario_R" placeholder="Nombre de usuario" required minlength="3">
+          <input type="password" id="password_R" placeholder="Contraseña" required>
+          <input type="password" id="repetir_password_R" placeholder="Repetir contraseña" required>
+          <input type="email" id="email_R" placeholder="Correo electrónico" required>
+          <input type="text" id="ciudad_R" placeholder="Ciudad" required minlength="3">
+          <input type="text" id="pais_R" placeholder="País" required minlength="3">
+          <select id="genero_R">
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+            <option value="Prefiero no decirlo">Prefiero no decirlo</option>
+          </select> <!-- Selector del nº dehijos que tiene el usuario, ingresando sus credenciales -->
+          <input type="number" id="hijos_R" placeholder="¿Cuántos hijos/hijas tienes?" min="0" onchange="mostrarCamposHijos()">
+          <div id="camposHijos"></div>
+          <button type="button" onclick="validarRegistro()">Aceptar</button>
+          <button type="button" onclick="cancelarRegistro()">Cancelar</button>
+          <button type="button" onclick="limpiarCamposR()">Limpiar Campos</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Pop-up de perfil -->
+    <div id="popup_Perfil" class="popup_Perfil">
+      <div class="popup_Perfil-content">
+        <span class="close" onclick="cerrarPopupPerfil()">&times;</span>
+        <h2>Mi Perfil</h2> <!-- Formulario de perfil -->
+        <form id="formPerfil">
+          <input type="text" id="perfil_usuario" placeholder="Nombre de usuario" required minlength="3">
+          <input type="password" id="perfil_password" placeholder="Contraseña" required>
+          <input type="email" id="perfil_email" placeholder="Correo electrónico" required>
+          <input type="text" id="perfil_ciudad" placeholder="Ciudad" required minlength="3">
+          <input type="text" id="perfil_pais" placeholder="País" required minlength="3">
+          <select id="perfil_genero">
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+            <option value="Prefiero no decirlo">Prefiero no decirlo</option>
+          </select>
+          <input type="number" id="perfil_hijos" placeholder="Número de hijos">
+          <div id="camposHijosPerfil"></div>
+          <button type="button" onclick="guardarPerfil()">Guardar</button>
+        </form>
+      </div>
+    </div>
+
+      <!-- Pop-up de Mis Cartas -->
+      <div id="popup_Cartas" class="popup-carta">
+        <div class="popup-content-carta">
+            <span class="close-carta" onclick="cerrarPopupCartas()">&times;</span>
+            <h2>Mis Cartas</h2>
+            <div id="contenedorCartas"></div>
+        </div>
+
+
+      <!-- Pop-up para ver el contenido de la carta -->
+      <div id="popupVerCarta" class="popupVerCarta">
+        <div class="popup-vercontent">
+            <span class="close" onclick="cerrarPopupVerCarta()">&times;</span>
+            <h2>Contenido de la carta:</h2>
+            <p class="contenidoCarta" id="contenidoCarta"></p>
+        </div>
+      </div>
+
+      </div>
+
+      <!-- Pop-up de Carrito -->
+      <div id="popup_Carrito" class="popupCarrito">
+        <div class="popup-content-carrito">
+            <span class="close" onclick="cerrarCarrito()">&times;</span>
+            <h2>Mi Carrito</h2>
+            <div id="contenedorCarrito">
+                <div id="carritoVacio">
+                    <p>¡Tu carrito está vacío!</p>
+                </div>
+                <div id="carritoLleno">
+                  <div id="productosCarrito"></div>
+                  <div id="totalCarrito"></div>
+                  <button onclick="comprarCesta()">Comprar</button>
+              </div>
+          </div>
+      </div>
+    </div>
+
+    <!-- Pop-up de Compras -->
+    <div id="popup_Compras" class="popupCompras">
+      <div class="popup-content-compras">
+          <span class="close" onclick="cerrarCompras()">&times;</span>
+          <h2>Mis Compras</h2>
+          <div id="contenedorCompras">
+              <div id="comprasVacias">
+                  <p>¡No has realizado ninguna compra!</p>
+              </div>
+              <div id="comprasRealizadas">
+                  <div id="productosComprados"></div>
+              </div>
+          </div>
+      </div>
+    </div>
+    
+    <!-- Secciones independientes -->
+    <section id="home"> <!-- Sección de inicio -->
+      <h1>Sigue a Papá Noel</h1>
+      <div class="contador">
+        <p id="contador"></p>
+      </div>
+    </section>
+
+    <script src="contador.js"></script>
+
+    <section id="papa-noel"> <!-- Sección de Papá Noel -->
+        <h1>Papá Noel</h1>
+        <div class="contenido">
+            <img src="media/papa noel pag2.jpg" alt="Imagen de Papá Noel" />
+          <div class="texto-papa-noel">
+            <h2>¿Quién es Papá Noel?</h2>
+            <p>
+              Papá Noel, también conocido como Santa Claus, es una figura
+              legendaria que simboliza la generosidad y el espíritu navideño en
+              muchas culturas. Se le describe como un hombre mayor, de barba
+              blanca, vestido de rojo, que trae regalos a los niños en la víspera
+              de Navidad. Su origen proviene de San Nicolás, un obispo famoso por
+              su bondad y actos de caridad. A lo largo de los siglos, Papá Noel ha
+              evolucionado en diferentes tradiciones, pero siempre manteniendo su
+              papel de portador de alegría. Vive en el Polo Norte, donde fabrica
+              juguetes junto a sus elfos. 
+            </p>
+          </div>
+        </div>
+      </section>
+ 
+      <section id="las-cartas"> <!-- Sección de las cartas -->
+        <h1>Las Cartas</h1>
+        <div class="contenido-cartas">
+          <div class="carta">
+            <h2>Carta 1</h2>
+            <img src="media/niñombappe.jpg" alt="Carta 1">
+            <p><strong>Nombre: Alberto Menchén</strong></p>
+            <p>Ciudad: Ciudad Real</p>
+            <p>País: España</p>
+          </div>
+          <div class="carta">
+            <h2>Carta 2</h2>
+            <img src="media/niña4.jpg" alt="Carta 2">
+            <p><strong>Nombre: Isabelle Dubois</strong></p> 
+            <p>Ciudad: París</p>
+            <p>País: Francia</p>
+          </div>
+          <div class="carta">
+            <h2>Carta 3</h2>
+            <img src="media/niño2.jpg" alt="Carta 3">
+            <p><strong>Nombre: Miguel Ochoa</strong></p>
+            <p>Ciudad: Tijuana </p>
+            <p>País: México</p>
+          </div>
+          <div class="carta">
+            <h2>Carta 4</h2>
+            <img src="media/niña.jpg" alt="Carta 4">
+            <p><strong>Nombre: Ana Martínez</strong></p>
+            <p>Ciudad: Valencia</p>
+            <p>País: España</p>
+          </div>
+          <div class="carta">
+            <h2>Carta 5</h2>
+            <img src="media/niño5.jpg" alt="Carta 5">
+            <p><strong>Nombre: Luis Fernández</strong></p>
+            <p>Ciudad: Buenos Aires</p>
+            <p>País: Argentina</p>
+          </div>
+          <div class="carta">
+            <h2>Carta 6</h2>
+            <img src="media/niña6.jpg" alt="Carta 6">
+            <p><strong>Nombre: Emma Müller</strong></p>
+            <p>Ciudad: Berlín</p>
+            <p>País: Alemania</p>
+          </div>
+        </div>
+      </section>
+
+
+      <section id="envia-tu-carta"> <!-- Sección para enviar cartas -->
+          <h1>Envía tu carta</h1>
+          <div class="carta-container">
+              <form class="carta-form" onsubmit="return enviarCarta(event)">
+                  <div class="form-group">
+                      <div class="form-left">
+                          <label for="nombre">Nombre:</label>
+                          <input type="text" id="nombre" name="nombre" required>
+
+                          <label for="email">Correo electrónico:</label>
+                          <input type="email" id="email" name="email" required>
+
+                          <label for="ciudad">Ciudad:</label>
+                          <input type="text" id="ciudad" name="ciudad" required>
+                          
+                      </div>
+
+                      <div class="form-right">
+                          <label for="pais">País:</label>
+                          <input type="text" id="pais" name="pais" required>
+
+                          <label for="carta">Carta para Papá Noel:</label>
+                          <textarea id="carta" name="carta" rows="10" required></textarea>
+                      </div>
+                  </div>
+                  <button type="submit">Enviar Carta</button>
+              </form>
+          </div>
+      </section>
+
+      <section id="juega"> <!-- Sección de juegos -->
+        <h1>¡Juega!</h1>
+        <div class="juegos">
+            <!-- Menú de juegos -->
+            <div class="menu-juegos-navideños">
+                <div class="marco-links"> <!-- Botones para seleccionar el juego -->
+                    <button onclick="mostrarJuego('clickTheCircle')">Click The Circle</button> 
+                    <button onclick="mostrarJuego('LaberintoNavideño')">Laberinto Navideño</button>
+                    <button onclick="mostrarJuego('memory')">Memory Card</button>
+                </div>
+            </div>
+            <!-- Contenedor del juego -->
+            <div id="contenedor-juego" class="contenedor-juego">
+                <!-- El contenido del juego se cargará aquí -->
+            </div>
+        </div>
+    </section>
+    
+      <section id="calendario-adviento">
+        <h1>Calendario de Adviento</h1>
+        <div id="popup-container"></div>
+        <div class="calendario-container">
+            <img src="media/calendario_adviento.jpg" alt="Calendario de Adviento" id="imagen-calendario">
+            <a href="#" class="numero-casilla" style="left: 10%; top: 2%;" onclick="openPopup(1)">1</a>
+            <a href="#" class="numero-casilla" style="left: 21%; top: 2%;" onclick="openPopup(2)">2</a>
+            <a href="#" class="numero-casilla" style="left: 31%; top: 2%;" onclick="openPopup(3)">3</a>
+            <a href="#" class="numero-casilla" style="left: 41%; top: 2%;" onclick="openPopup(4)">4</a>
+            <a href="#" class="numero-casilla" style="left: 51%; top: 2%;" onclick="openPopup(5)">5</a>
+            <a href="#" class="numero-casilla" style="left: 10%; top: 22%;" onclick="openPopup(6)">6</a>
+            <a href="#" class="numero-casilla" style="left: 21%; top: 22%;" onclick="openPopup(7)">7</a>
+            <a href="#" class="numero-casilla" style="left: 31%; top: 22%;" onclick="openPopup(8)">8</a>
+            <a href="#" class="numero-casilla" style="left: 41%; top: 22%;" onclick="openPopup(9)">9</a>
+            <a href="#" class="numero-casilla" style="left: 51%; top: 22%;" onclick="openPopup(10)">10</a>
+            <a href="#" class="numero-casilla" style="left: 10%; top: 42%;" onclick="openPopup(11)">11</a>
+            <a href="#" class="numero-casilla" style="left: 21%; top: 42%;" onclick="openPopup(12)">12</a>
+            <a href="#" class="numero-casilla" style="left: 31%; top: 42%;" onclick="openPopup(13)">13</a>
+            <a href="#" class="numero-casilla" style="left: 41%; top: 42%;" onclick="openPopup(14)">14</a>
+            <a href="#" class="numero-casilla" style="left: 51%; top: 42%;" onclick="openPopup(15)">15</a>
+            <a href="#" class="numero-casilla" style="left: 10%; top: 62%;" onclick="openPopup(16)">16</a>
+            <a href="#" class="numero-casilla" style="left: 21%; top: 62%;" onclick="openPopup(17)">17</a>
+            <a href="#" class="numero-casilla" style="left: 31%; top: 62%;" onclick="openPopup(18)">18</a>
+            <a href="#" class="numero-casilla" style="left: 41%; top: 62%;" onclick="openPopup(19)">19</a>
+            <a href="#" class="numero-casilla" style="left: 51%; top: 62%;" onclick="openPopup(20)">20</a>
+            <a href="#" class="numero-casilla" style="left: 10%; top: 82%;" onclick="openPopup(21)">21</a>
+            <a href="#" class="numero-casilla" style="left: 21%; top: 82%;" onclick="openPopup(22)">22</a>
+            <a href="#" class="numero-casilla" style="left: 31%; top: 82%;" onclick="openPopup(23)">23</a>
+            <a href="#" class="numero-casilla" style="left: 41%; top: 82%;" onclick="openPopup(24)">24</a>
+            <a href="#" class="numero-casilla" style="left: 51%; top: 82%;" onclick="openPopup(25)">25</a>
+        </div>
+        
+        <!-- Pop-ups del calendario de adviento -->
+        <div id="popup_Calendario_1" class="popup-calendario">
+            <div class="popup-content-calendario">
+                <span class="close-calendario" onclick="cerrarPopup(1)">&times;</span>
+                <div id="contenidoPopup_1">¿Estás preparado para el inicio del viaje? </div>
+                <img src="media/día1.jpg" alt="Principio del viaje" id="día1">
+            </div>
+        </div>
+        </div>
+        <div id="popup_Calendario_2" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(2)">&times;</span>
+              <div id="contenidoPopup_2">¡Empieza la época de luces y nieve!</div>
+              <img src="media/día2.jpg" alt="Imagen del día 2" id="día2">
+          </div>
+      </div>
+      <div id="popup_Calendario_3" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(3)">&times;</span>
+              <div id="contenidoPopup_3">¡Aprovecha para salir a patinar con tus amigos!</div>
+              <img src="media/día3.gif" alt="Imagen del día 3" id="día3">
+          </div>
+      </div>
+      <div id="popup_Calendario_4" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(4)">&times;</span>
+              <div id="contenidoPopup_4">¿Has salido ya a hacer tu muñeco de nieve?</div>
+              <img src="media/día4.gif" alt="Imagen del día 4" id="día4">
+          </div>
+      </div>
+      <div id="popup_Calendario_5" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(5)">&times;</span>
+              <div id="contenidoPopup_5">Papa Noel se pone manos a la obra</div>
+              <img src="media/día5.gif" alt="Imagen del día 5" id="día5">
+          </div>
+      </div>
+      <div id="popup_Calendario_6" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(6)">&times;</span>
+              <div id="contenidoPopup_6">Idead vuestro árbol, en poco tiempo os tocará ponerlo</div>
+              <img src="media/día6.gif" alt="Imagen del día 6" id="día6">
+          </div>
+      </div>
+      <div id="popup_Calendario_7" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(7)">&times;</span>
+              <div id="contenidoPopup_7">¡ILUSIÓN, uno de los sentimientos que mejor define estas fechas! </div>
+              <img src="media/día7.gif" alt="Imagen del día 7" id="día7">
+          </div>
+      </div>
+      <div id="popup_Calendario_8" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(8)">&times;</span>
+              <div id="contenidoPopup_8">Comparte tiempo con tus mejores amigos</div>
+              <img src="media/día8.gif" alt="Imagen del día 8" id="día8">
+          </div>
+      </div>
+      <div id="popup_Calendario_9" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(9)">&times;</span>
+              <div id="contenidoPopup_9">¡Santa ya se ha hecho con los primeros regalos!</div>
+              <img src="media/día9.gif" alt="Imagen del día 9" id="día9">
+          </div>
+      </div>
+      <div id="popup_Calendario_10" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(10)">&times;</span>
+              <div id="contenidoPopup_10">Elabora recetas navideñas</div>
+              <img src="media/día10.jpg" alt="Imagen del día 10" id="día10">
+          </div>
+      </div>
+      <div id="popup_Calendario_11" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(11)">&times;</span>
+              <div id="contenidoPopup_11">¡Monta el árbol de navidad con tu familia!</div>
+              <img src="media/día11.jpg" alt="Imagen del día 11" id="día11">
+          </div>
+      </div>
+      <div id="popup_Calendario_12" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(12)">&times;</span>
+              <div id="contenidoPopup_12">Juntate con tus familiares para cenar de forma recurrente</div>
+              <img src="media/día12.jpg" alt="Imagen del día 12" id="día12">
+          </div>
+      </div>
+      <div id="popup_Calendario_13" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(13)">&times;</span>
+              <div id="contenidoPopup_13">¡¡¡APROVECHA!!! es la única etapa en la que te dejarán disfrutar deportes en la nieve</div>
+              <img src="media/día13.gif" alt="Imagen del día 13" id="día13">
+          </div>
+      </div>
+      <div id="popup_Calendario_14" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(14)">&times;</span>
+              <div id="contenidoPopup_14">Los elfos ayudan a Santa a hacerse con todas los regalos</div>
+              <img src="media/día14.jpg" alt="Imagen del día 14" id="día14">
+          </div>
+      </div>
+      <div id="popup_Calendario_15" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(15)">&times;</span>
+              <div id="contenidoPopup_15">Los renos también quieren ayudar</div>
+              <img src="media/día15.gif" alt="Imagen del día 15" id="día15">
+          </div>
+      </div>
+      <div id="popup_Calendario_16" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(16)">&times;</span>
+              <div id="contenidoPopup_16">¡Haz tu carta! Santa necesita tiempo para leerlas y poder hacerse con todos los regalos</div>
+              <img src="media/día16.jpg" alt="Imagen del día 16" id="día16">
+          </div>
+      </div>
+      <div id="popup_Calendario_17" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(17)">&times;</span>
+              <div id="contenidoPopup_17">¿Qué le dejarás de comida a Papa Noel? </div>
+              <img src="media/día17.gif" alt="Imagen del día 17" id="día17">
+          </div>
+      </div>
+      <div id="popup_Calendario_18" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(18)">&times;</span>
+              <div id="contenidoPopup_18">¡Papa Noel tiene tiempo para divertirse!</div>
+              <img src="media/día18.gif" alt="Imagen del día 18" id="día18">
+          </div>
+      </div>
+      <div id="popup_Calendario_19" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(19)">&times;</span>
+              <div id="contenidoPopup_19">¡Es el momento de jugar a tus juegos de mesa favoritos¡</div>
+              <img src="media/día19.gif" alt="Imagen del día 19" id="día19">
+          </div>
+      </div>
+      <div id="popup_Calendario_20" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(20)">&times;</span>
+              <div id="contenidoPopup_20">Disfruta el tiempo con tus abuelos y familiares cercanos</div>
+              <img src="media/día20.jpg" alt="Imagen del día 20" id="día20">
+          </div>
+      </div>
+      <div id="popup_Calendario_21" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(21)">&times;</span>
+              <div id="contenidoPopup_21">¿Eres capaz de encontrar a Papa Noel?</div>
+              <img src="media/encuentra a papa noel.jpg" alt="Imagen del día 21" id="día21">
+          </div>
+      </div>
+      <div id="popup_Calendario_22" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(22)">&times;</span>
+              <div id="contenidoPopup_22">Papa Noel ya tiene todo listo</div>
+              <img src="media/día22.gif" alt="Imagen del día 22" id="día22">
+          </div>
+      </div>
+      <div id="popup_Calendario_23" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(23)">&times;</span>
+              <div id="contenidoPopup_23">Santa emprede el viaje con todos los regalos preparados</div>
+              <img src="media/día23.gif" alt="Imagen del día 23" id="día23">
+          </div>
+      </div>
+      <div id="popup_Calendario_24" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(24)">&times;</span>
+              <div id="contenidoPopup_24">¡Papa Noel ya está repartiendo los primeros regalos en aquellos paises en los que ya es la noche de Navidad!</div>
+              <img src="media/día24.gif" alt="Imagen del día 24" id="día24">
+          </div>
+      </div>
+      <div id="popup_Calendario_25" class="popup-calendario">
+          <div class="popup-content-calendario">
+              <span class="close-calendario" onclick="cerrarPopup(25)">&times;</span>
+              <div id="contenidoPopup_25">¡¡¡¡¡Feliz Navidad!!!!!</div>
+              <img src="media/día25.gif" alt="Imagen del día 25" id="día25">
+          </div>
+      </div>
+    </section>
+    
+    <section id="marketplace"><!-- Sección de mercado online -->
+      <h1>Marketplace</h1>
+      <div class="marketplace-container">
+          <div class="producto">
+              <figure>
+                  <img src="media/producto1.png" alt="Producto 1">
+              </figure>
+              <div class="info-producto">
+                <h2>Cerámica De Papá Noel</h2>
+                <p class = "precio">30€</p>
+                <button onclick="abrirPopUpMarketplace(1)">Ver artículo</button>
+              </div>
+          </div>
+          <div class="producto">
+              <figure>
+                <img src="media/producto2.png" alt="Producto 1">
+            </figure>
+            <div class="info-producto">
+              <h2>Inflable Papá Noel</h2>
+              <p class = "precio">20€</p>
+              <button onclick="abrirPopUpMarketplace(2)">Ver artículo</button>
+            </div>
+          </div>
+          <div class="producto">
+              <figure>
+                  <img src="media/producto3.png" alt="Producto 1">
+              </figure>
+              <div class="info-producto">
+                <h2>Inflable Trineo Completo</h2>
+                <p class = "precio">50€</p>
+                <button onclick="abrirPopUpMarketplace(3)">Ver artículo</button>
+              </div>
+          </div>
+          <div class="producto">
+              <figure>
+                  <img src="media/producto4.png" alt="Producto 1">
+              </figure>
+              <div class="info-producto">
+                <h2>Escalera con Papá Noel</h2>
+                <p class = "precio">25€</p>
+                <button  onclick="abrirPopUpMarketplace(4)">Ver artículo</button>
+              </div>
+          </div>
+          <div class="producto">
+            <figure>
+                <img src="media/producto5.png" alt="Producto 1">
+            </figure>
+            <div class="info-producto">
+              <h2>Peluches Navideños</h2>
+              <p class = "precio">15€</p>
+              <button  onclick="abrirPopUpMarketplace(5)">Ver artículo</button>
+            </div>
+        </div>
+          <div class="producto">
+            <figure>
+                <img src="media/producto6.png" alt="Producto 1">
+            </figure>
+            <div class="info-producto">
+              <h2>Muñecos Cascanueces</h2>
+              <p class = "precio">10€</p>
+              <button  onclick="abrirPopUpMarketplace(6)">Ver artículo</button>
+            </div>
+        </div>
+      </div>
+  </section>
+
+    <!-- Pop-ups de Marketplace -->
+     <!-- Pop-up Producto1 -->
+    <div class="popupMarketplace" id="popup_Marketplace_1">
+      <div class="popup-content-product">
+        <span class="closeProduct" onclick="cerrarPopUpMarketplace(1)">&times;</span>
+        <div class="product-info-left">
+          <img src="media/producto1.png" alt="Producto 1" id="imagen_producto_1">
+          <button onclick="añadirAlCarrito(1)">Añadir al carrito</button>
+          <div class="product-price-quantity">
+            <p class="precio" id="precio_producto_1">Precio: 30€</p>
+            <button onclick="restarArticulo(1)">-</button>
+            <span id="cantidad_producto_1">1</span>
+            <button onclick="sumarArticulo(1)">+</button>
+          </div>
+        </div>
+        <div class="product-info-right">
+          <h2 class="nombre_producto_1" id="nombre_producto_1">Cerámica De Papá Noel</h2>
+          <p>Descripción: Figura de cerámica de Papá Noelpintada a mano con detalles minuciosos que capturan la esencia de la Navidad.
+             Perfecta para decorar cualquier rincón de tu hogar, aportando un toque tradicional y encantador. 
+             Esta figura también es ideal como regalo para coleccionistas o amantes de la decoración navideña.</p>
+          <div class="product-delivery">
+            <p><strong>Entrega</strong></p>
+            <p>Entrega a domicilio: <strong>GRATIS</strong> <br> Entre el 21-23 de Diciembre</p>
+            <p>Entrega a domicilio PREMIUM: <strong>4,5€</strong> <br> Llega el 16 de Diciembre antes de las 10 p.m.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pop-up Producto2 -->
+    <div class="popupMarketplace" id="popup_Marketplace_2">
+      <div class="popup-content-product">
+        <span class="closeProduct" onclick="cerrarPopUpMarketplace(2)">&times;</span>
+        <div class="product-info-left">
+          <img src="media/producto2.png" alt="Producto 2" id="imagen_producto_2">
+          <button onclick="añadirAlCarrito(2)">Añadir al carrito</button>
+          <div class="product-price-quantity">
+            <p class="precio" id="precio_producto_2">Precio: 20€</p>
+            <button onclick="restarArticulo(2)">-</button>
+            <span id="cantidad_producto_2">1</span>
+            <button onclick="sumarArticulo(2)">+</button>
+          </div>
+        </div>
+        <div class="product-info-right">
+          <h2 class="nombre_producto_2" id="nombre_producto_2">Inflable Papá Noel</h2>
+          <p>Descripción: Un impresionante Papá Noel inflable con iluminación LED integrada para exteriores e interiores.
+             Fabricado con materiales resistentes al agua y diseñado para resistir el invierno.
+             Este inflable incluye un inflador eléctrico para facilitar el montaje y es perfecto para jardines, terrazas o eventos navideños. </p>
+          <div class="product-delivery">
+            <p><strong>Entrega</strong></p>
+            <p>Entrega a domicilio: <strong>GRATIS</strong> <br> Entre el 18-20 de Diciembre</p>
+            <p>Entrega a domicilio PREMIUM: <strong>4,5€</strong> <br> Llega el 15 de Diciembre</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pop-up Producto3 -->
+      <div id="popup_Marketplace_3" class="popupMarketplace">
+        <div class="popup-content-product">
+          <span class="closeProduct" onclick="cerrarPopUpMarketplace(3)">&times;</span>
+          <div class="product-info-left">
+            <img src="media/producto3.png" alt="Inflable Trineo Completo" id="imagen_producto_3">
+            <button onclick="añadirAlCarrito(3)">Añadir al carrito</button>
+            <div class="product-price-quantity">
+              <p id="precio_producto_3" class="precio">Precio: 50€</p>
+              <button onclick="restarArticulo(3)">-</button>
+              <span id="cantidad_producto_3">1</span>
+              <button onclick="sumarArticulo(3)">+</button>
+            </div>
+          </div>
+          <div class="product-info-right">
+            <h2 id="nombre_producto_3" class="nombre_producto_3">Inflable Trineo Completo</h2>
+            <p>Descripción: Este espectacular inflable de trineo navideño incluye a Papá Noel y sus renos, creando una escena mágica y llamativa. 
+                Con una longitud de 3 metros, es ideal para destacar en decoraciones exteriores. 
+                Incluye anclajes para mayor estabilidad y luces LED que brillan en la noche.</p>
+            <div class="product-delivery">
+              <p><strong>Entrega</strong></p>
+              <p>Entrega a domicilio: <strong>GRATIS</strong> <br> Entre el 19-21 de Diciembre</p>
+              <p>Entrega a domicilio PREMIUM: <strong>4,5€</strong> <br> Llega el 14 de Diciembre</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Popup Producto4 -->
+       <!-- Popup para Escalera con Papá Noel -->
+      <div id="popup_Marketplace_4" class="popupMarketplace">
+        <div class="popup-content-product">
+          <span class="closeProduct" onclick="cerrarPopUpMarketplace(4)">&times;</span>
+          <div class="product-info-left">
+            <img src="media/producto4.png" alt="Escalera con Papá Noel" id="imagen_producto_4">
+            <button onclick="añadirAlCarrito(4)">Añadir al carrito</button>
+            <div class="product-price-quantity">
+              <p id="precio_producto_4" class="precio">Precio: 25€</p>
+              <button onclick="restarArticulo(4)">-</button>
+              <span id="cantidad_producto_4">1</span>
+              <button onclick="sumarArticulo(4)">+</button>
+            </div>
+          </div>
+          <div class="product-info-right">
+            <h2 id="nombre_producto_4" class="nombre_producto_4">Escalera con Papá Noel</h2>
+            <p>Descripción: Una figura divertida y original que muestra a Papá Noel escalando una escalera con luces intermitentes.
+               Esta decoración es perfecta para puertas, ventanas o chimeneas, y añade un toque de humor y alegría a tu hogar durante las fiestas.</p>
+            <div class="product-delivery">
+              <p><strong>Entrega</strong></p>
+              <p>Entrega a domicilio: <strong>GRATIS</strong> <br> Entre el 20-22 de Diciembre</p>
+              <p>Entrega a domicilio PREMIUM: <strong>4,5€</strong> <br> Llega el 16 de Diciembre antes de las 6 p.m.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Popup Producto5 -->
+        <div id="popup_Marketplace_5" class="popupMarketplace">
+          <div class="popup-content-product">
+            <span class="closeProduct" onclick="cerrarPopUpMarketplace(5)">&times;</span>
+            <div class="product-info-left">
+              <img src="media/producto5.png" alt="Peluches Navideños" id="imagen_producto_5">
+              <button onclick="añadirAlCarrito(5)">Añadir al carrito</button>
+              <div class="product-price-quantity">
+                <p id="precio_producto_5" class="precio">Precio: 15€</p>
+                <button onclick="restarArticulo(5)">-</button>
+                <span id="cantidad_producto_5">1</span>
+                <button onclick="sumarArticulo(5)">+</button>
+              </div>
+            </div>
+            <div class="product-info-right">
+              <h2 id="nombre_producto_5" class="nombre_producto_5">Peluches Navideños</h2>
+              <p>Descripción: Una colección de adorables peluches navideños, disponibles en varios diseños que incluyen renos, elfos y Papá Noel.
+                 Suaves y esponjosos, son ideales como regalos para niños y también pueden ser un detalle encantador para decorar tu hogar.</p>
+              <div class="product-delivery">
+                <p><strong>Entrega</strong></p>
+                <p>Entrega a domicilio: <strong>GRATIS</strong> <br> Entre el 22-24 de Diciembre</p>
+                <p>Entrega a domicilio PREMIUM: <strong>4,5€</strong> <br>  Llega el 17 de Diciembre</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Popup Producto6 -->
+         <!-- Popup para Muñecos Cascanueces -->
+          <div id="popup_Marketplace_6" class="popupMarketplace">
+            <div class="popup-content-product">
+              <span class="closeProduct" onclick="cerrarPopUpMarketplace(6)">&times;</span>
+              <div class="product-info-left">
+                <img src="media/producto6.png" alt="Muñecos Cascanueces" id="imagen_producto_6">
+                <button onclick="añadirAlCarrito(6)">Añadir al carrito</button>
+                <div class="product-price-quantity">
+                  <p id="precio_producto_6" class="precio">Precio: 10€</p>
+                  <button onclick="restarArticulo(6)">-</button>
+                  <span id="cantidad_producto_6">1</span>
+                  <button onclick="sumarArticulo(6)">+</button>
+                </div>
+              </div>
+              <div class="product-info-right">
+                <h2 id="nombre_producto_6" class="nombre_producto_6">Muñecos Cascanueces</h2>
+                <p>Descripción: Inspirados en la tradición navideña, estos muñecos cascanueces son piezas decorativas únicas hechas de madera y pintadas a mano.
+                   Perfectos para coleccionistas y entusiastas de las decoraciones clásicas. Añade un toque de elegancia y tradición a tu hogar con estas piezas únicas.</p>
+                <div class="product-delivery">
+                  <p><strong>Entrega</strong></p>
+                  <p>Entrega a domicilio: <strong>GRATIS</strong> <br> Entre el 23-25 de Diciembre</p>
+                  <p>Entrega a domicilio PREMIUM: <strong>4,5€</strong> <br> Llega el 15 de Diciembre</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+    <section id="quiz">
+      <h1>Quiz</h1>
+      <div id="quiz-container">
+          <div id="question-container">
+              <p id="question"></p>
+          </div>
+          <div id="score-container">
+              <p>Respuestas correctas: <span id="score">0</span>/5</p>
+          </div>
+          <div id="answers-container">
+              <button class="answer"></button>
+              <button class="answer"></button>
+              <button class="answer"></button>
+          </div>
+      </div>
+    </section>
+
+
+    <section id="catalogoJuguetes">
+      <h1>Catálogo de Juguetes</h1>
+      <div id="catalogo-boton">
+        <button id="boton-anterior" onclick="paginaAnterior()" aria-label="Página anterior"> < </button>
+        <div id="catalogo">
+          <div class="pagina-catalogo" id="pagina1">
+            <img src="media/portada-catalogo.jpg" alt="Portada">
+          </div>
+          <div class="pagina-catalogo" id="pagina2">
+            <img src="media/pagina1.png" alt="Juguetes 1">
+          </div>
+          <div class="pagina-catalogo" id="pagina3">
+            <img src="media/pagina2.png" alt="Juguetes 2">
+          </div>
+          <div class="pagina-catalogo" id="pagina4">
+            <img src="media/contraportada-catalogo.png" alt="Contraportadaa">
+          </div>
+        </div>
+        <button id="boton-siguiente" onclick="paginaSiguiente()" aria-label="Página siguiente"> > </button>
+      </div>
+      <div id="indicador"></div>
+    </section>
+
+
+
+    <!-- Mapa de seguimiento -->
+    <section id="mapa-localizacion">
+      <h1>Localiza a Papá Noel</h1>
+      <div class="mapa-container">
+        <img src="media/mapamundi.jpg" alt="Mapamundi" id="imagen-mapamundi">
+        <div class="santa-icon" id="santa-icon">
+          <div class="info-mapa">Madrid, España</div>
+        </div>
+      </div>
+      <button id="localizar-btn">LOCALIZAR</button>
+
+    </section>
+
+    <!-- Sección de videollamada -->
+    <section id="cita-papa-noel" class="seccion-fondo">
+      <div class="cita-contenedor">
+        <h1 class="cita-titulo">Videollamada con Papá Noel</h1>
+        <form id="form-cita-papa-noel" class="formulario-cita" onsubmit="reservarVideollamada(event)">
+          <label for="nombre-videollamada" class="cita-label">Nombre:</label>
+          <input type="text" id="nombre-videollamada" name="nombre" class="cita-input" required>
+    
+          <label for="email-videollamada" class="cita-label">Correo Electrónico:</label>
+          <input type="email" id="email-videollamada" name="email" class="cita-input" required>
+    
+          <label for="fecha-videollamada" class="cita-label">Fecha de la Cita:</label>
+          <input type="date" id="fecha-videollamada" name="fecha" class="cita-input" required>
+    
+          <label for="hora-videollamada" class="cita-label">Hora de la Cita:</label>
+          <input type="time" id="hora-videollamada" name="hora" class="cita-input" required>
+    
+          <label for="mensaje-videollamada" class="cita-label">Mensaje para Papá Noel:</label>
+          <textarea id="mensaje-videollamada" name="mensaje" class="cita-textarea" rows="4" required></textarea>
+    
+          <button type="submit" class="cita-boton">Reservar Cita</button>
+        </form>
+      </div>
+    </section>
+
+
+
+  <footer class="footer"> <!-- Pie de página -->
+    <div class="redes-sociales">
+      <h3><strong>Nuestras redes sociales</strong></h3>
+      <a href="https://www.facebook.com/"><img src="media/Facebook.png" alt="Facebook"></a>
+      <a href="https://www.instagram.com/"><img src="media/Instagram.png" alt="Instagram"></a>
+      <a href="https://www.twitter.com/"><img src="media/X.png" alt="Twitter"></a>
+    </div>
+    <div class="contacto"> 
+      <p>Contacto: 654 789 321</p><br>
+      <p>Correo: siguealsanta@rudolf.com</p>
+    </div>
+    <div class="politicas">
+      <p><a href= "https://privacy.thewaltdisneycompany.com/es/politica-de-privacidad/">Políticas de privacidad</a></p><br> 
+      <p><a href="https://www.disneylandparis.com/es-es/legal/terminos-y-condiciones-de-reserva/">Términos y condiciones</a></p>
+    </div>
+  </footer>
+</body>
+</html>
